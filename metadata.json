@@ -1,5 +1,5 @@
 {
-  "name": "Copy of FTTH Network Predictive Optimization App",
-  "description": "A web application to connect with HubSoft and other network APIs for data visualization, reporting, and predictive network optimization.",
+  "name": "FTTH Guardian AI",
+  "description": "An enterprise-grade platform for real-time monitoring and predictive optimization of FTTH networks, featuring a complete MLOps lifecycle, explainable AI (XAI), and automated reporting.",
   "requestFramePermissions": []
 }

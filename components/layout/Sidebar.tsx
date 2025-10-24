@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { NAV_ITEMS, SunIcon, MoonIcon } from '../../constants';
 import type { Page, Theme } from '../../types';
@@ -19,8 +18,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage })
 
   return (
     <aside className="w-64 flex-shrink-0 bg-card-light dark:bg-card-dark border-r border-slate-200 dark:border-slate-700 flex flex-col">
-      <div className="h-16 flex items-center justify-center border-b border-slate-200 dark:border-slate-700">
-        <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">FTTH Predict</h1>
+      <div className="h-16 flex items-center justify-center border-b border-slate-200 dark:border-slate-700 px-4">
+        <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400 truncate">FTTH Guardian AI</h1>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-2">
         {NAV_ITEMS.map((item) => (
@@ -29,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage })
             onClick={() => setCurrentPage(item.id)}
             className={`w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
               currentPage === item.id
-                ? 'bg-primary-500 text-white shadow-md'
+                ? 'bg-primary-600 text-white shadow-md'
                 : 'text-text-light-secondary dark:text-dark-secondary hover:bg-primary-50 dark:hover:bg-slate-700'
             }`}
           >

@@ -1,7 +1,16 @@
 import type React from 'react';
 
-export type Page = 'predictive_intelligence' | 'api_returns' | 'reports' | 'settings';
+export type Page = 'monitoring' | 'predictive_intelligence' | 'api_returns' | 'reports' | 'settings';
 export type Theme = 'light' | 'dark';
+export type Role = 'Admin' | 'Operator' | 'Executive' | 'Guest';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  lastLogin: string;
+}
 
 export interface HubsoftConfig {
   graphqlUrl: string;
@@ -45,8 +54,12 @@ export interface AppContextType {
   setSystemPreferences: (prefs: SystemPreferences) => void;
   notificationPreferences: NotificationPreferences;
   setNotificationPreferences: (prefs: NotificationPreferences) => void;
+  users: User[];
+  setUsers: (users: User[]) => void;
+  currentUserRole: Role;
 }
 
+// API & Data Types
 export interface Client {
   id_cliente: number;
   codigo_cliente: string;
@@ -83,6 +96,22 @@ export interface SyncLog {
     error?: string;
 }
 
+// Monitoring Types
+export interface TelemetryDataPoint {
+    time: string;
+    opticalPower: number;
+    latency: number;
+    disconnections: number;
+}
+
+export interface Alert {
+    id: string;
+    severity: 'critical' | 'warning' | 'info';
+    message: string;
+    timestamp: string;
+    entity: string;
+}
+
 // Machine Learning Types
 export interface ModelMetrics {
     version: string;
@@ -93,12 +122,25 @@ export interface ModelMetrics {
     trainingDate: string;
 }
 
+export interface FeatureContribution {
+    feature: string;
+    value: string | number;
+    contribution: number; // positive or negative
+}
+
+export interface ShapValues {
+    baseValue: number;
+    finalPrediction: number;
+    contributions: FeatureContribution[];
+}
+
 export interface Prediction {
     id: string;
     entity: string; // e.g., "ONU XYZ-123" or "Cliente 456"
     riskPercentage: number;
     timeframe: '24h' | '48h' | '72h';
     details: string;
+    shapValues: ShapValues;
 }
 
 export interface FeatureImportance {
@@ -110,4 +152,19 @@ export interface PredictionHistory {
     date: string;
     predicted: number;
     actual: number;
+}
+
+export interface DriftDataPoint {
+    date: string;
+    value: number;
+    baseline: number;
+}
+
+// Reports
+export interface ReportHistory {
+    id: string;
+    type: 'Operacional' | 'Machine Learning';
+    generatedAt: string;
+    generatedBy: string;
+    filters: string;
 }

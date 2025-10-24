@@ -1,32 +1,34 @@
 import React, { useState, useMemo } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
-import SettingsPage from './pages/SettingsPage';
-import ApiReturnsPage from './pages/ApiReturnsPage';
-import PredictiveIntelligencePage from './pages/PredictiveIntelligencePage';
-import ReportsPage from './pages/ReportsPage';
-import { Page, AppContextType } from './types';
+import SettingsPage from './modules/settings/SettingsPage';
+import ApiReturnsPage from './modules/api_returns/ApiReturnsPage';
+import PredictiveIntelligencePage from './modules/predictive_intelligence/PredictiveIntelligencePage';
+import ReportsPage from './modules/reports/ReportsPage';
+import MonitoringDashboard from './modules/monitoring/MonitoringDashboard';
+import { Page, AppContextType, User, Role } from './types';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import type { HubsoftConfig, OtherIntegration, SystemPreferences, NotificationPreferences } from './types';
+import { MOCK_USERS } from './services/hubsoftService';
 
 export const AppContext = React.createContext<AppContextType | null>(null);
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('predictive_intelligence');
+  const [currentPage, setCurrentPage] = useState<Page>('monitoring');
   const [theme, setTheme] = useTheme();
   
   const [hubsoftConfig, setHubsoftConfig] = useLocalStorage<HubsoftConfig>('hubsoftConfig', {
     graphqlUrl: 'https://api.hubsoft.com.br/graphql/v1',
     restUrl: 'https://api.hubsoft.com.br/api/v1/',
-    authToken: '',
-    companyId: '',
+    authToken: 'demo-token-123',
+    companyId: '12345',
   });
 
   const [otherIntegrations, setOtherIntegrations] = useLocalStorage<OtherIntegration[]>('otherIntegrations', []);
   
   const [systemPreferences, setSystemPreferences] = useLocalStorage<SystemPreferences>('systemPreferences', {
     language: 'pt',
-    refreshInterval: 300,
+    refreshInterval: 5, // Set to 5s for real-time demo
     timeFormat: '24h',
   });
 
@@ -40,6 +42,9 @@ const App: React.FC = () => {
     },
   });
 
+  const [users, setUsers] = useLocalStorage<User[]>('users', MOCK_USERS);
+  const [currentUserRole, setCurrentUserRole] = useState<Role>('Admin');
+
   const contextValue = useMemo(() => ({
     theme,
     setTheme,
@@ -51,26 +56,32 @@ const App: React.FC = () => {
     setSystemPreferences,
     notificationPreferences,
     setNotificationPreferences,
+    users,
+    setUsers,
+    currentUserRole,
   }), [
     theme, setTheme, 
     hubsoftConfig, setHubsoftConfig, 
     otherIntegrations, setOtherIntegrations, 
     systemPreferences, setSystemPreferences,
-    notificationPreferences, setNotificationPreferences
+    notificationPreferences, setNotificationPreferences,
+    users, setUsers, currentUserRole
   ]);
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'settings':
-        return <SettingsPage />;
-      case 'api_returns':
-        return <ApiReturnsPage />;
+      case 'monitoring':
+        return <MonitoringDashboard />;
       case 'predictive_intelligence':
         return <PredictiveIntelligencePage />;
+      case 'api_returns':
+        return <ApiReturnsPage />;
       case 'reports':
         return <ReportsPage />;
+      case 'settings':
+        return <SettingsPage />;
       default:
-        return <PredictiveIntelligencePage />;
+        return <MonitoringDashboard />;
     }
   };
 

@@ -1,16 +1,28 @@
-
 import React from 'react';
 import type { Page } from './types';
 
-export const ChartBarIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-  </svg>
+export const GlobeAltIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A11.953 11.953 0 0112 13.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253M12 21a9.004 9.004 0 008.716-6.747" />
+    </svg>
+);
+
+export const CpuChipIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5M12 4.5v15M15.75 21v-1.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 6.375a4.125 4.125 0 014.125-4.125h5.25a4.125 4.125 0 014.125 4.125v11.25a4.125 4.125 0 01-4.125 4.125h-5.25a4.125 4.125 0 01-4.125-4.125V6.375z" />
+    </svg>
+);
+
+export const DocumentTextIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+    </svg>
 );
 
 export const Cog6ToothIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-.962a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02 1.11-.962.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224.224-.384.57-.439.91-.046.55-.562 1.02-1.11.962a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02.962-1.11.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224.224-.384-.57-.439-.91z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-.962a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02 1.11-.962.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224.224-.384-.57-.439.91-.046.55-.562 1.02-1.11.962a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02.962-1.11.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224-.224-.384-.57-.439-.91z" />
   </svg>
 );
 
@@ -45,18 +57,6 @@ export const PlusCircleIcon: React.FC<{ className?: string }> = ({ className = "
     </svg>
 );
 
-export const UserGroupIcon: React.FC<{ className?: string }> = ({ className = "w-8 h-8" }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962c.51.056 1.02.086 1.5.086 1.83 0 3.59-.38 5.25-1.055m-5.25-.512c.267-.287.524-.593.77-1.055m-7.5-2.962c.51.056 1.02.086 1.5.086 1.83 0 3.59-.38 5.25-1.055m-5.25-.512c.267-.287.524-.593.77-1.055m-1.5 5.545c-3.141-1.352-5.25-4.586-5.25-8.161 0-3.182 1.55-6.035 4.097-7.632L12 3c2.548 1.597 4.097 4.45 4.097 7.632 0 3.575-2.109 6.809-5.25 8.161z" />
-    </svg>
-);
-
-export const WrenchScrewdriverIcon: React.FC<{ className?: string }> = ({ className = "w-8 h-8" }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.528-1.023.895-2.158.9-3.328A7.5 7.5 0 005.126 5.126c-1.17.005-2.305.372-3.328.9L3 6.63m11.42 8.54l-11-11" />
-    </svg>
-);
-
 export interface NavItem {
   id: Page;
   label: string;
@@ -64,6 +64,8 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'visualization', label: 'Visualização', icon: ChartBarIcon },
+  { id: 'predictive_intelligence', label: 'Inteligência Preditiva', icon: CpuChipIcon },
+  { id: 'api_returns', label: 'APIs e Retornos', icon: GlobeAltIcon },
+  { id: 'reports', label: 'Relatórios PDF', icon: DocumentTextIcon },
   { id: 'settings', label: 'Configurações', icon: Cog6ToothIcon },
 ];

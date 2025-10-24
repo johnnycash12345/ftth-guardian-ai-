@@ -33,7 +33,6 @@ const ApiReturnsPage: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchData = useCallback(async (page = 1) => {
-    // FIX: Property 'baseUrl' does not exist on type 'HubsoftConfig'. Use 'graphqlUrl' instead.
     if (!hubsoftConfig.graphqlUrl) {
       setToast({ message: "Por favor, configure a API da HubSoft na página de Configurações.", type: 'error' });
       return;
@@ -70,7 +69,6 @@ const ApiReturnsPage: React.FC = () => {
   useEffect(() => {
     fetchData(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // FIX: Property 'baseUrl' does not exist on type 'HubsoftConfig'. Use 'graphqlUrl' instead.
   }, [activeDataSet, hubsoftConfig.graphqlUrl]); // re-fetch if config changes
 
   const onPageChange = (page: number) => {

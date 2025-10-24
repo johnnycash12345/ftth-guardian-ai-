@@ -1,23 +1,20 @@
-
 import type React from 'react';
 
-export type Page = 'visualization' | 'settings';
+export type Page = 'predictive_intelligence' | 'api_returns' | 'reports' | 'settings';
 export type Theme = 'light' | 'dark';
 
 export interface HubsoftConfig {
-  host: string;
-  clientId: string;
-  clientSecret: string;
-  username: string;
-  password?: string;
-  token?: string;
+  graphqlUrl: string;
+  restUrl: string;
+  authToken: string;
+  companyId: string;
 }
 
 export interface OtherIntegration {
   id: string;
   name: string;
   url: string;
-  type: 'SNMP' | 'OTDR' | 'REST' | 'Other';
+  type: 'SNMP' | 'OLT' | 'OTDR' | 'NetFlow' | 'Other';
   token: string;
 }
 
@@ -25,6 +22,16 @@ export interface SystemPreferences {
   language: 'pt' | 'en';
   refreshInterval: number;
   timeFormat: '12h' | '24h';
+}
+
+export interface NotificationPreferences {
+  email: boolean;
+  popup: boolean;
+  events: {
+    failures: boolean;
+    criticalPredictions: boolean;
+    disconnections: boolean;
+  };
 }
 
 export interface AppContextType {
@@ -36,6 +43,8 @@ export interface AppContextType {
   setOtherIntegrations: (integrations: OtherIntegration[]) => void;
   systemPreferences: SystemPreferences;
   setSystemPreferences: (prefs: SystemPreferences) => void;
+  notificationPreferences: NotificationPreferences;
+  setNotificationPreferences: (prefs: NotificationPreferences) => void;
 }
 
 export interface Client {
@@ -61,19 +70,44 @@ export interface PaginatorInfo {
   total: number;
 }
 
-export interface ClientsApiResponse {
+export interface ApiResponse<T> {
   paginatorInfo: PaginatorInfo;
-  data: Client[];
-}
-
-export interface ServiceOrdersApiResponse {
-  paginatorInfo: PaginatorInfo;
-  data: ServiceOrder[];
+  data: T[];
 }
 
 export interface SyncLog {
     timestamp: Date;
     responseTime: number;
     status: 'OK' | 'Error';
+    httpStatus: number;
     error?: string;
+}
+
+// Machine Learning Types
+export interface ModelMetrics {
+    version: string;
+    algorithm: string;
+    accuracy: number;
+    f1Score: number;
+    rocAuc: number;
+    trainingDate: string;
+}
+
+export interface Prediction {
+    id: string;
+    entity: string; // e.g., "ONU XYZ-123" or "Cliente 456"
+    riskPercentage: number;
+    timeframe: '24h' | '48h' | '72h';
+    details: string;
+}
+
+export interface FeatureImportance {
+    feature: string;
+    importance: number;
+}
+
+export interface PredictionHistory {
+    date: string;
+    predicted: number;
+    actual: number;
 }

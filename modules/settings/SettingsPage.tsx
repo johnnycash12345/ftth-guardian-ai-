@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../App';
-import type { AppContextType, HubsoftConfig, OtherIntegration, SystemPreferences, NotificationPreferences } from '../../types';
+import type { AppContextType, HubsoftConfig, OtherIntegration, SystemPreferences, NotificationPreferences, SimulatorConfig } from '../../types';
 import { Card } from '../../components/common/Card';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
@@ -22,19 +22,27 @@ const SettingsPage: React.FC = () => {
     otherIntegrations, setOtherIntegrations, 
     systemPreferences, setSystemPreferences,
     notificationPreferences, setNotificationPreferences,
+    simulatorConfig, setSimulatorConfig
   } = useContext(AppContext) as AppContextType;
 
   const [localHubsoftConfig, setLocalHubsoftConfig] = useState<HubsoftConfig>(hubsoftConfig);
   const [localPreferences, setLocalPreferences] = useState<SystemPreferences>(systemPreferences);
   const [localNotifications, setLocalNotifications] = useState<NotificationPreferences>(notificationPreferences);
+  const [localSimulatorConfig, setLocalSimulatorConfig] = useState<SimulatorConfig>(simulatorConfig);
   
   const [isTesting, setIsTesting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [testResponse, setTestResponse] = useState<object | null>(null);
+  const [isTestingSimulator, setIsTestingSimulator] = useState(false);
+  const [simulatorTestResponse, setSimulatorTestResponse] = useState<object | null>(null);
 
 
   const handleHubsoftChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalHubsoftConfig({ ...localHubsoftConfig, [e.target.name]: e.target.value });
+  };
+  
+  const handleSimulatorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSimulatorConfig({ ...localSimulatorConfig, [e.target.name]: e.target.value });
   };
 
   const handlePreferencesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -56,6 +64,11 @@ const SettingsPage: React.FC = () => {
     setToast({ message: 'Configurações da HubSoft salvas!', type: 'success' });
   };
 
+  const handleSaveSimulator = () => {
+    setSimulatorConfig(localSimulatorConfig);
+    setToast({ message: 'Configurações do Simulador salvas!', type: 'success' });
+  };
+
   const handleSavePreferences = () => {
     setSystemPreferences(localPreferences);
     setNotificationPreferences(localNotifications);
@@ -74,6 +87,21 @@ const SettingsPage: React.FC = () => {
       setTestResponse({ error: error.message });
     } finally {
       setIsTesting(false);
+    }
+  };
+  
+  const handleTestSimulatorConnection = async () => {
+    setIsTestingSimulator(true);
+    setSimulatorTestResponse(null);
+    try {
+        const response = await hubsoftService.testSimulatorConnection(localSimulatorConfig);
+        setToast({ message: 'Conexão com o Simulador bem-sucedida!', type: 'success' });
+        setSimulatorTestResponse(response.data);
+    } catch (error: any) {
+        setToast({ message: `Falha na conexão: ${error.message}`, type: 'error' });
+        setSimulatorTestResponse({ error: error.message });
+    } finally {
+        setIsTestingSimulator(false);
     }
   };
 
@@ -113,6 +141,21 @@ const SettingsPage: React.FC = () => {
                 <div className="mt-6 flex justify-end space-x-3">
                 <Button variant="secondary" onClick={handleTestConnection} isLoading={isTesting}>Testar Conexão</Button>
                 <Button onClick={handleSaveHubsoft}>Salvar</Button>
+                </div>
+            </Card>
+
+            <Card title="Integração FTTH Data Simulator">
+                <p className="text-sm text-text-light-secondary dark:text-dark-secondary mb-6">
+                    Conecte o Guardian ao simulador para habilitar o aprendizado contínuo.
+                </p>
+                <div className="space-y-4">
+                    <Input label="URL do FTTH Data Simulator" id="sim-url" name="url" value={localSimulatorConfig.url} onChange={handleSimulatorChange} />
+                    <Input label="API Key do Data Simulator" id="sim-apiKey" name="apiKey" type="password" value={localSimulatorConfig.apiKey} onChange={handleSimulatorChange} />
+                </div>
+                {simulatorTestResponse && <div className="mt-6"><JsonViewer data={simulatorTestResponse} /></div>}
+                <div className="mt-6 flex justify-end space-x-3">
+                    <Button variant="secondary" onClick={handleTestSimulatorConnection} isLoading={isTestingSimulator}>Testar Conexão</Button>
+                    <Button onClick={handleSaveSimulator}>Salvar</Button>
                 </div>
             </Card>
 

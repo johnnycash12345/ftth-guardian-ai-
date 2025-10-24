@@ -43,6 +43,44 @@ export interface NotificationPreferences {
   };
 }
 
+// Continuous Learning Types
+export interface SimulatorConfig {
+  url: string;
+  apiKey: string;
+}
+
+export type FeedbackLoopStatus = 'active' | 'inactive' | 'alert';
+
+// Simplified schemas for frontend simulation
+export interface OpticalMetrics { powerRX: number; powerTX: number; }
+export interface ElectricalMetrics { voltage: number; temperature: number; }
+export interface NetworkMetrics { latency: number; jitter: number; }
+export interface PhysicalMetrics { fiberDistance: number; equipmentAge: number; }
+export interface StatusMetrics { uptime: number; activeAlarms: number; }
+export interface ContextMetrics { hourOfDay: number; }
+
+export interface GuardianPredictionRequest {
+  equipmentId: string;
+  metrics: {
+    optical: OpticalMetrics;
+    electrical: ElectricalMetrics;
+    network: NetworkMetrics;
+    physical: PhysicalMetrics;
+    status: StatusMetrics;
+    context: ContextMetrics;
+  };
+  timestamp: number;
+}
+
+export interface FeedbackData {
+  simulationId: string;
+  correctPredictions: any[]; // Simplified for frontend
+  incorrectPredictions: {
+    prediction: any;
+    actualOutcome: string;
+  }[];
+}
+
 export interface AppContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -57,6 +95,9 @@ export interface AppContextType {
   users: User[];
   setUsers: (users: User[]) => void;
   currentUserRole: Role;
+  simulatorConfig: SimulatorConfig;
+  setSimulatorConfig: (config: SimulatorConfig) => void;
+  feedbackLoopStatus: FeedbackLoopStatus;
 }
 
 // API & Data Types

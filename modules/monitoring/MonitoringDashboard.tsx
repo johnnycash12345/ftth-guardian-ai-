@@ -4,12 +4,12 @@ import { StatCard } from '../../components/common/StatCard';
 import { CpuChipIcon, ChartBarIcon, DocumentTextIcon, GlobeAltIcon } from '../../constants';
 import { AppContext } from '../../App';
 import * as hubsoftService from '../../services/hubsoftService';
-import type { AppContextType, TelemetryDataPoint, Alert } from '../../types';
+import type { AppContextType, TelemetryDataPoint, Alert, FeedbackLoopStatus } from '../../types';
 import { RealTimeChart } from './components/RealTimeChart';
 import { AlertsList } from './components/AlertsList';
 
 const MonitoringDashboard: React.FC = () => {
-    const { systemPreferences } = useContext(AppContext) as AppContextType;
+    const { systemPreferences, feedbackLoopStatus } = useContext(AppContext) as AppContextType;
     const [telemetry, setTelemetry] = useState<TelemetryDataPoint[]>([]);
     const [alerts, setAlerts] = useState<Alert[]>([]);
 
@@ -23,6 +23,16 @@ const MonitoringDashboard: React.FC = () => {
 
         return () => clearInterval(intervalId);
     }, [systemPreferences.refreshInterval]);
+    
+    const renderFeedbackStatus = () => {
+        const statusConfig: Record<FeedbackLoopStatus, { text: string; className: string }> = {
+            active: { text: '● Ativo', className: 'text-green-500 font-bold' },
+            inactive: { text: '● Inativo', className: 'text-yellow-500 font-bold' },
+            alert: { text: '● Alerta (Erro > 5%)', className: 'text-red-500 font-bold' },
+        };
+        const config = statusConfig[feedbackLoopStatus];
+        return <span className={config.className}>{config.text}</span>;
+    };
 
     return (
         <div className="space-y-8">
@@ -50,6 +60,10 @@ const MonitoringDashboard: React.FC = () => {
                        <div className="space-y-3">
                             <div className="flex justify-between items-center"><span className="font-medium">Coleta de Dados (Hubsoft)</span><span className="text-green-500 font-bold">● Operacional</span></div>
                             <div className="flex justify-between items-center"><span className="font-medium">Serviço de Inferência ML</span><span className="text-green-500 font-bold">● Operacional</span></div>
+                            <div className="flex justify-between items-center">
+                                <span className="font-medium">Feedback Loop (Simulator)</span>
+                                {renderFeedbackStatus()}
+                            </div>
                             <div className="flex justify-between items-center"><span className="font-medium">Pipeline de Treinamento</span><span className="text-yellow-500 font-bold">● Em Espera</span></div>
                             <div className="flex justify-between items-center"><span className="font-medium">Gateway de Notificações</span><span className="text-green-500 font-bold">● Operacional</span></div>
                        </div>

@@ -2,24 +2,76 @@ import React, { useState } from 'react';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import Toast from '../../components/common/Toast';
-import { DocumentTextIcon, CpuChipIcon } from '../../constants';
 import { Input } from '../../components/common/Input';
 import { ReportHistoryTable } from './components/ReportHistoryTable';
+import * as hubsoftService from '../../services/hubsoftService';
+import * as pdfGenerator from '../../services/pdfGenerator';
+import { PdfChartRenderer } from './components/PdfChartRenderer';
+import type { FeatureImportance, DriftDataPoint } from '../../types';
+
+declare const html2canvas: any;
+
+interface PdfChartData {
+    importanceData: FeatureImportance[];
+    driftData: DriftDataPoint[];
+}
 
 const ReportsPage: React.FC = () => {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [reportType, setReportType] = useState<'operational' | 'ml'>('operational');
+    const [pdfChartData, setPdfChartData] = useState<PdfChartData | null>(null);
 
-    const handleGenerateReport = (e: React.FormEvent) => {
+    const handleGenerateReport = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsGenerating(true);
-        setToast({ message: `Gerando relatório... O download começará em breve.`, type: 'success' });
-        setTimeout(() => setIsGenerating(false), 2000);
+        setToast({ message: `Gerando relatório...`, type: 'success' });
+
+        try {
+            if (reportType === 'operational') {
+                const predictions = await hubsoftService.fetchPredictions();
+                await pdfGenerator.generateOperationalReport(predictions);
+                setToast({ message: `Relatório Operacional gerado com sucesso!`, type: 'success' });
+            } else if (reportType === 'ml') {
+                // Step 1: Fetch all data needed for the PDF
+                const [metrics, importance, driftData] = await Promise.all([
+                    hubsoftService.fetchModelMetrics(),
+                    hubsoftService.fetchFeatureImportance(),
+                    hubsoftService.fetchModelDrift(),
+                ]);
+
+                // Step 2: Set the data in state to render the hidden chart component
+                setPdfChartData({ importanceData: importance, driftData });
+
+                // Step 3: Wait for the component to render and then capture it
+                setTimeout(async () => {
+                    const importanceCanvas = await html2canvas(document.getElementById('importance-chart-pdf-container'));
+                    const driftCanvas = await html2canvas(document.getElementById('drift-chart-pdf-container'));
+                    
+                    const importanceChartImage = importanceCanvas.toDataURL('image/png', 1.0);
+                    const driftChartImage = driftCanvas.toDataURL('image/png', 1.0);
+                    
+                    await pdfGenerator.generateMLReport(metrics, importance, driftChartImage, importanceChartImage);
+                    
+                    setToast({ message: `Relatório de ML gerado com sucesso!`, type: 'success' });
+                    setPdfChartData(null); // Clean up the DOM
+                }, 500); // 500ms delay to ensure charts are rendered before capture
+            }
+        } catch (error) {
+            console.error('Failed to generate report:', error);
+            setToast({ message: `Erro ao gerar relatório.`, type: 'error' });
+            setPdfChartData(null);
+        } finally {
+            // Delay setting isGenerating to false to allow for download to start
+            setTimeout(() => setIsGenerating(false), 1000);
+        }
     };
-    
+
     return (
         <div className="space-y-8">
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+            {pdfChartData && <PdfChartRenderer {...pdfChartData} />}
+
             <h1 className="text-3xl font-bold">Relatórios PDF</h1>
 
             <Card title="Gerar Novo Relatório">
@@ -27,7 +79,13 @@ const ReportsPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label htmlFor="reportType" className="block text-sm font-medium text-text-light-secondary dark:text-dark-secondary mb-1">Tipo de Relatório</label>
-                            <select id="reportType" name="reportType" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                            <select 
+                                id="reportType" 
+                                name="reportType" 
+                                value={reportType}
+                                onChange={(e) => setReportType(e.target.value as 'operational' | 'ml')}
+                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                            >
                                 <option value="operational">Operacional</option>
                                 <option value="ml">Machine Learning</option>
                             </select>
@@ -43,40 +101,7 @@ const ReportsPage: React.FC = () => {
                 </form>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card>
-                    <div className="flex items-start space-x-4">
-                        <DocumentTextIcon className="w-10 h-10 text-primary-500 mt-1 flex-shrink-0" />
-                        <div>
-                            <h3 className="font-semibold">Relatório Operacional</h3>
-                            <p className="text-text-light-secondary dark:text-dark-secondary text-sm">Gere um relatório completo com os principais indicadores de performance da rede.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
-                                <li>Clientes ativos e com falha</li>
-                                <li>Tempo médio de reparo (MTTR)</li>
-                                <li>Ordens de serviço abertas/concluídas</li>
-                            </ul>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card>
-                     <div className="flex items-start space-x-4">
-                        <CpuChipIcon className="w-10 h-10 text-primary-500 mt-1 flex-shrink-0" />
-                        <div>
-                           <h3 className="font-semibold">Relatório de Machine Learning</h3>
-                           <p className="text-text-light-secondary dark:text-dark-secondary text-sm">Exporte um relatório técnico detalhado sobre a performance e as características do modelo preditivo.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
-                                <li>Métricas: Acurácia, F1-Score, ROC-AUC</li>
-                                <li>Principais features influentes</li>
-                                <li>Matriz de confusão e curva ROC</li>
-                            </ul>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-
             <ReportHistoryTable />
-
         </div>
     );
 };

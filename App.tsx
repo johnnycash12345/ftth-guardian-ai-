@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import SettingsPage from './modules/settings/SettingsPage';
 import ApiReturnsPage from './modules/api_returns/ApiReturnsPage';
 import PredictiveIntelligencePage from './modules/predictive_intelligence/PredictiveIntelligencePage';
 import ReportsPage from './modules/reports/ReportsPage';
 import MonitoringDashboard from './modules/monitoring/MonitoringDashboard';
-import { Page, AppContextType, User, Role } from './types';
+import { Page, AppContextType, User, Role, SimulatorConfig, FeedbackLoopStatus } from './types';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import type { HubsoftConfig, OtherIntegration, SystemPreferences, NotificationPreferences } from './types';
@@ -45,6 +45,24 @@ const App: React.FC = () => {
   const [users, setUsers] = useLocalStorage<User[]>('users', MOCK_USERS);
   const [currentUserRole, setCurrentUserRole] = useState<Role>('Admin');
 
+  const [simulatorConfig, setSimulatorConfig] = useLocalStorage<SimulatorConfig>('simulatorConfig', {
+    url: 'http://localhost:8001/api/v1',
+    apiKey: 'sim-secret-key-123'
+  });
+  
+  const [feedbackLoopStatus, setFeedbackLoopStatus] = useState<FeedbackLoopStatus>('inactive');
+
+  // Simulate feedback status changes for demonstration
+  useEffect(() => {
+    const statuses: FeedbackLoopStatus[] = ['inactive', 'active', 'active', 'active', 'alert', 'active'];
+    let i = 0;
+    const interval = setInterval(() => {
+        i = (i + 1) % statuses.length;
+        setFeedbackLoopStatus(statuses[i]);
+    }, 15000); // Change status every 15 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const contextValue = useMemo(() => ({
     theme,
     setTheme,
@@ -59,13 +77,17 @@ const App: React.FC = () => {
     users,
     setUsers,
     currentUserRole,
+    simulatorConfig,
+    setSimulatorConfig,
+    feedbackLoopStatus,
   }), [
     theme, setTheme, 
     hubsoftConfig, setHubsoftConfig, 
     otherIntegrations, setOtherIntegrations, 
     systemPreferences, setSystemPreferences,
     notificationPreferences, setNotificationPreferences,
-    users, setUsers, currentUserRole
+    users, setUsers, currentUserRole,
+    simulatorConfig, setSimulatorConfig, feedbackLoopStatus
   ]);
 
   const renderPage = () => {

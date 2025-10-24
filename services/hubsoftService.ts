@@ -1,4 +1,4 @@
-import type { HubsoftConfig, ApiResponse, Client, ServiceOrder, ModelMetrics, Prediction, FeatureImportance, PredictionHistory, User, Role, TelemetryDataPoint, Alert, ShapValues, DriftDataPoint, ReportHistory } from '../types';
+import type { HubsoftConfig, ApiResponse, Client, ServiceOrder, ModelMetrics, Prediction, FeatureImportance, PredictionHistory, User, Role, TelemetryDataPoint, Alert, ShapValues, DriftDataPoint, ReportHistory, SimulatorConfig } from '../types';
 
 // --- MOCK DATA ---
 export const MOCK_USERS: User[] = [
@@ -198,3 +198,16 @@ export const fetchReportHistory = async (): Promise<ReportHistory[]> => {
     await simulateNetworkDelay(300);
     return MOCK_REPORT_HISTORY;
 }
+
+// --- Simulator Service Mocks ---
+export const testSimulatorConnection = async (config: SimulatorConfig): Promise<{ success: boolean; data: any }> => {
+  await simulateNetworkDelay(1200);
+  if (config.url && config.apiKey) {
+    if (config.apiKey.includes('fail')) {
+        throw new Error("API Key do simulador inválida.");
+    }
+    return { success: true, data: { simulator: "FTTH Data Simulator v2.0", status: "Ready", version: "2.0.0"} };
+  } else {
+    throw new Error("Parâmetros de conexão com o simulador ausentes.");
+  }
+};

@@ -1,4 +1,5 @@
-import type { HubsoftConfig, ApiResponse, Client, ServiceOrder, ModelMetrics, Prediction, FeatureImportance, PredictionHistory, User, Role, TelemetryDataPoint, Alert, ShapValues, DriftDataPoint, ReportHistory, SimulatorConfig } from '../types';
+import type { HubsoftConfig, ApiResponse, Client, ServiceOrder, ModelMetrics, Prediction, FeatureImportance, PredictionHistory, User, Role, TelemetryDataPoint, Alert, ShapValues, DriftDataPoint, ReportHistory, SimulatorConfig, FeedbackData, GuardianPredictionResponse } from '../types';
+import { AppError } from '../types';
 
 // --- MOCK DATA ---
 export const MOCK_USERS: User[] = [
@@ -24,7 +25,8 @@ const MOCK_SERVICE_ORDERS: ServiceOrder[] = Array.from({ length: 30 }, (_, i) =>
     creation_date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
 }));
 
-const MOCK_MODEL_METRICS: ModelMetrics = {
+// Make model metrics mutable for dynamic updates
+let DYNAMIC_MOCK_MODEL_METRICS: ModelMetrics = {
     version: 'v2.0.1-prod',
     algorithm: 'XGBoost',
     accuracy: 0.94,
@@ -84,16 +86,6 @@ const MOCK_ALERTS: Alert[] = [
     { id: 'a3', severity: 'info', message: 'Retreinamento do modelo concluído com sucesso.', timestamp: new Date(Date.now() - 26 * 3600 * 1000).toISOString(), entity: 'MLOps Pipeline' },
 ];
 
-const MOCK_DRIFT_DATA: DriftDataPoint[] = Array.from({length: 30}, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (30 - i));
-    return {
-        date: date.toISOString().split('T')[0],
-        value: 0.95 - (i > 20 ? (i-20) * 0.015 : 0) - Math.random() * 0.02,
-        baseline: 0.94
-    }
-});
-
 const MOCK_REPORT_HISTORY: ReportHistory[] = [
     { id: 'r1', type: 'Operacional', generatedAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(), generatedBy: 'Admin User', filters: 'Período: Últimas 24h'},
     { id: 'r2', type: 'Machine Learning', generatedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), generatedBy: 'MLOps Pipeline', filters: 'Modelo: v2.0.1'},
@@ -105,14 +97,18 @@ const simulateNetworkDelay = (delay = 500) => new Promise(res => setTimeout(res,
 
 export const testConnection = async (config: HubsoftConfig): Promise<{ success: boolean; data: any }> => {
   await simulateNetworkDelay(1000);
-  if (config.graphqlUrl && config.authToken && config.companyId) {
-    if (config.authToken === 'fail') {
-        throw new Error("Token de autenticação inválido.");
-    }
-    return { success: true, data: { id: config.companyId, nome_empresa: "Minha Empresa FTTH", status: "ATIVA"} };
-  } else {
-    throw new Error("Parâmetros de conexão ausentes.");
+  if (!config.graphqlUrl || !config.authToken || !config.companyId) {
+    const missing = [
+      !config.graphqlUrl && "GraphQL URL",
+      !config.authToken && "Auth Token",
+      !config.companyId && "Company ID",
+    ].filter(Boolean).join(', ');
+    throw new AppError(`Parâmetros de conexão ausentes: ${missing}.`, { config });
   }
+  if (config.authToken.includes('fail')) {
+    throw new AppError("Token de autenticação inválido. Verifique suas credenciais.", { config, technicalDetails: "Authentication failed with provided token." });
+  }
+  return { success: true, data: { id: config.companyId, nome_empresa: "Minha Empresa FTTH", status: "ATIVA"} };
 };
 
 const paginate = <T,>(items: T[], page: number, perPage: number): ApiResponse<T> => {
@@ -133,7 +129,7 @@ const paginate = <T,>(items: T[], page: number, perPage: number): ApiResponse<T>
 export const fetchClients = async (config: HubsoftConfig, page = 1): Promise<ApiResponse<Client>> => {
     await simulateNetworkDelay();
     if (!config.graphqlUrl) {
-        throw new Error("URL GraphQL da API não configurada.");
+        throw new AppError("URL GraphQL da API não configurada.", { config });
     }
     return paginate(MOCK_CLIENTS, page, 10);
 };
@@ -141,7 +137,7 @@ export const fetchClients = async (config: HubsoftConfig, page = 1): Promise<Api
 export const fetchServiceOrders = async (config: HubsoftConfig, page = 1): Promise<ApiResponse<ServiceOrder>> => {
     await simulateNetworkDelay();
      if (!config.graphqlUrl) {
-        throw new Error("URL GraphQL da API não configurada.");
+        throw new AppError("URL GraphQL da API não configurada.", { config });
     }
     return paginate(MOCK_SERVICE_ORDERS, page, 10);
 };
@@ -150,7 +146,8 @@ export const fetchServiceOrders = async (config: HubsoftConfig, page = 1): Promi
 
 export const fetchModelMetrics = async (): Promise<ModelMetrics> => {
     await simulateNetworkDelay(300);
-    return MOCK_MODEL_METRICS;
+    // Return a copy to avoid direct mutation from other parts of the app
+    return { ...DYNAMIC_MOCK_MODEL_METRICS };
 }
 
 export const fetchPredictions = async (): Promise<Prediction[]> => {
@@ -169,6 +166,14 @@ export const fetchPredictionHistory = async (): Promise<PredictionHistory[]> => 
 }
 
 // --- New Service Mocks ---
+export const fetchNetworkHealthScore = async (): Promise<{ score: number; trend: 'up' | 'down' | 'stable' }> => {
+    await simulateNetworkDelay(400);
+    return {
+        score: 96.5,
+        trend: 'up',
+    };
+};
+
 export const fetchRealTimeTelemetry = async (): Promise<TelemetryDataPoint> => {
     // No delay, should be fast for real-time simulation
     const now = new Date();
@@ -182,16 +187,32 @@ export const fetchRealTimeTelemetry = async (): Promise<TelemetryDataPoint> => {
 
 export const fetchAlerts = async (): Promise<Alert[]> => {
     await simulateNetworkDelay(200);
+    // To test error state: throw new AppError("Falha ao carregar alertas do sistema.", {source: 'fetchAlerts'});
     return MOCK_ALERTS;
 }
 
+const generateDynamicDriftData = (baseline: number, length = 30): DriftDataPoint[] => {
+    return Array.from({ length }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (length - i));
+        return {
+            date: date.toISOString().split('T')[0],
+            value: baseline + (Math.random() - 0.5) * (baseline * 0.1), // Randomize around baseline by +/- 10%
+            baseline: baseline,
+        };
+    });
+};
+
+
 export const fetchModelDrift = async (): Promise<DriftDataPoint[]> => {
     await simulateNetworkDelay(500);
-    return MOCK_DRIFT_DATA;
+    return generateDynamicDriftData(DYNAMIC_MOCK_MODEL_METRICS.accuracy);
 }
+
 export const fetchDataDrift = async (): Promise<DriftDataPoint[]> => {
     await simulateNetworkDelay(500);
-    return MOCK_DRIFT_DATA.map(d => ({...d, value: d.value - 0.1, baseline: 0.85})).reverse();
+    // Use a fixed baseline for data drift for demonstration
+    return generateDynamicDriftData(0.85); 
 }
 
 export const fetchReportHistory = async (): Promise<ReportHistory[]> => {
@@ -204,10 +225,35 @@ export const testSimulatorConnection = async (config: SimulatorConfig): Promise<
   await simulateNetworkDelay(1200);
   if (config.url && config.apiKey) {
     if (config.apiKey.includes('fail')) {
-        throw new Error("API Key do simulador inválida.");
+        throw new AppError("API Key do simulador inválida.", { config });
     }
     return { success: true, data: { simulator: "FTTH Data Simulator v2.0", status: "Ready", version: "2.0.0"} };
   } else {
-    throw new Error("Parâmetros de conexão com o simulador ausentes.");
+    throw new AppError("Parâmetros de conexão com o simulador ausentes.", { config });
   }
+};
+
+export const sendFeedbackData = async (feedback: FeedbackData): Promise<{ message: string }> => {
+    await simulateNetworkDelay(700);
+    console.log("Feedback data received by mock service:", feedback);
+    const totalPredictions = feedback.correctPredictions.length + feedback.incorrectPredictions.length;
+    const errorRate = totalPredictions > 0 ? (feedback.incorrectPredictions.length / totalPredictions) * 100 : 0;
+
+    if (errorRate > 5) {
+        console.log(`Error rate ${errorRate.toFixed(2)}% exceeds 5% threshold. Triggering retraining pipeline...`);
+        
+        // --- Simulate model update ---
+        const versionParts = DYNAMIC_MOCK_MODEL_METRICS.version.split('.');
+        const patchVersion = parseInt(versionParts[2].split('-')[0]) + 1;
+        DYNAMIC_MOCK_MODEL_METRICS.version = `${versionParts[0]}.${versionParts[1]}.${patchVersion}-prod`;
+        DYNAMIC_MOCK_MODEL_METRICS.accuracy = Math.min(0.99, DYNAMIC_MOCK_MODEL_METRICS.accuracy + 0.02 * Math.random());
+        DYNAMIC_MOCK_MODEL_METRICS.f1Score = Math.min(0.95, DYNAMIC_MOCK_MODEL_METRICS.f1Score + 0.02 * Math.random());
+        DYNAMIC_MOCK_MODEL_METRICS.rocAuc = Math.min(0.99, DYNAMIC_MOCK_MODEL_METRICS.rocAuc + 0.01 * Math.random());
+        DYNAMIC_MOCK_MODEL_METRICS.trainingDate = new Date().toISOString();
+        // --- End simulation ---
+
+        return { message: `Feedback recebido! Retreinamento acionado (Taxa de erro: ${errorRate.toFixed(2)}%). Novo modelo: ${DYNAMIC_MOCK_MODEL_METRICS.version}` };
+    }
+
+    return { message: `Feedback recebido. Taxa de erro (${errorRate.toFixed(2)}%) dentro do limite.` };
 };

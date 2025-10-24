@@ -8,6 +8,7 @@ import * as hubsoftService from '../../services/hubsoftService';
 import * as pdfGenerator from '../../services/pdfGenerator';
 import { PdfChartRenderer } from './components/PdfChartRenderer';
 import type { FeatureImportance, DriftDataPoint } from '../../types';
+import { handleError } from '../../utils/errorHandler';
 
 declare const html2canvas: any;
 
@@ -33,38 +34,52 @@ const ReportsPage: React.FC = () => {
                 await pdfGenerator.generateOperationalReport(predictions);
                 setToast({ message: `Relatório Operacional gerado com sucesso!`, type: 'success' });
             } else if (reportType === 'ml') {
-                // Step 1: Fetch all data needed for the PDF
                 const [metrics, importance, driftData] = await Promise.all([
                     hubsoftService.fetchModelMetrics(),
                     hubsoftService.fetchFeatureImportance(),
                     hubsoftService.fetchModelDrift(),
                 ]);
 
-                // Step 2: Set the data in state to render the hidden chart component
                 setPdfChartData({ importanceData: importance, driftData });
 
-                // Step 3: Wait for the component to render and then capture it
                 setTimeout(async () => {
-                    const importanceCanvas = await html2canvas(document.getElementById('importance-chart-pdf-container'));
-                    const driftCanvas = await html2canvas(document.getElementById('drift-chart-pdf-container'));
-                    
-                    const importanceChartImage = importanceCanvas.toDataURL('image/png', 1.0);
-                    const driftChartImage = driftCanvas.toDataURL('image/png', 1.0);
-                    
-                    await pdfGenerator.generateMLReport(metrics, importance, driftChartImage, importanceChartImage);
-                    
-                    setToast({ message: `Relatório de ML gerado com sucesso!`, type: 'success' });
-                    setPdfChartData(null); // Clean up the DOM
-                }, 500); // 500ms delay to ensure charts are rendered before capture
+                    try {
+                        const importanceContainer = document.getElementById('importance-chart-pdf-container');
+                        const driftContainer = document.getElementById('drift-chart-pdf-container');
+
+                        if (!importanceContainer || !driftContainer) {
+                            throw new Error("Elementos do gráfico para PDF não encontrados no DOM.");
+                        }
+
+                        const importanceCanvas = await html2canvas(importanceContainer);
+                        const driftCanvas = await html2canvas(driftContainer);
+                        
+                        const importanceChartImage = importanceCanvas.toDataURL('image/png', 1.0);
+                        const driftChartImage = driftCanvas.toDataURL('image/png', 1.0);
+                        
+                        await pdfGenerator.generateMLReport(metrics, importance, driftChartImage, importanceChartImage);
+                        
+                        setToast({ message: `Relatório de ML gerado com sucesso!`, type: 'success' });
+                    } catch (captureError) {
+                        const userMessage = handleError(captureError);
+                        setToast({ message: userMessage, type: 'error' });
+                    } finally {
+                        setPdfChartData(null);
+                    }
+                }, 500);
             }
         } catch (error) {
-            console.error('Failed to generate report:', error);
-            setToast({ message: `Erro ao gerar relatório.`, type: 'error' });
+            const userMessage = handleError(error);
+            setToast({ message: userMessage, type: 'error' });
             setPdfChartData(null);
         } finally {
-            // Delay setting isGenerating to false to allow for download to start
             setTimeout(() => setIsGenerating(false), 1000);
         }
+    };
+    
+    const reportDescriptions = {
+        operational: "Um resumo das previsões de falha ativas para a equipe de campo, ideal para planejamento de manutenção proativa.",
+        ml: "Uma análise técnica detalhada da performance do modelo de IA, incluindo métricas, drift e importância de features."
     };
 
     return (
@@ -72,12 +87,15 @@ const ReportsPage: React.FC = () => {
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             {pdfChartData && <PdfChartRenderer {...pdfChartData} />}
 
-            <h1 className="text-3xl font-bold">Relatórios PDF</h1>
+            <h1 className="text-3xl font-bold">Relatórios</h1>
+            <p className="text-text-light-secondary dark:text-dark-secondary -mt-6">
+                Gere e baixe relatórios operacionais e técnicos em formato PDF.
+            </p>
 
-            <Card title="Gerar Novo Relatório">
+            <Card title="Gerar Novo Relatório" subtitle="Selecione o tipo de relatório e o período desejado.">
                 <form onSubmit={handleGenerateReport}>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                        <div className="md:col-span-3">
                             <label htmlFor="reportType" className="block text-sm font-medium text-text-light-secondary dark:text-dark-secondary mb-1">Tipo de Relatório</label>
                             <select 
                                 id="reportType" 
@@ -89,12 +107,13 @@ const ReportsPage: React.FC = () => {
                                 <option value="operational">Operacional</option>
                                 <option value="ml">Machine Learning</option>
                             </select>
+                             <p className="text-xs text-text-light-secondary dark:text-dark-secondary mt-2">
+                                {reportDescriptions[reportType]}
+                            </p>
                         </div>
                         <Input label="Data de Início" id="startDate" type="date" />
                         <Input label="Data de Fim" id="endDate" type="date" />
-                    </div>
-                    <div className="mt-6 flex justify-end">
-                        <Button type="submit" isLoading={isGenerating}>
+                         <Button type="submit" isLoading={isGenerating}>
                             {isGenerating ? 'Gerando...' : 'Gerar e Baixar PDF'}
                         </Button>
                     </div>

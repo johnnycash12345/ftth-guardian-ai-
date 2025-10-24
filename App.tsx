@@ -113,7 +113,9 @@ const App: React.FC = () => {
         <div className="flex h-screen bg-background-light dark:bg-background-dark text-text-light-primary dark:text-dark-primary">
           <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-            {renderPage()}
+            <div className="animate-fadeIn">
+              {renderPage()}
+            </div>
           </main>
         </div>
       </div>

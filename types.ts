@@ -4,6 +4,23 @@ export type Page = 'monitoring' | 'predictive_intelligence' | 'api_returns' | 'r
 export type Theme = 'light' | 'dark';
 export type Role = 'Admin' | 'Operator' | 'Executive' | 'Guest';
 
+export class AppError extends Error {
+  public readonly userMessage: string;
+  public readonly technicalDetails: any;
+
+  constructor(userMessage: string, technicalDetails?: any, originalError?: Error) {
+    super(userMessage);
+    this.name = 'AppError';
+    this.userMessage = userMessage;
+    this.technicalDetails = {
+      ...technicalDetails,
+      originalError: originalError?.message,
+      stack: originalError?.stack
+    };
+    Object.setPrototypeOf(this, AppError.prototype);
+  }
+}
+
 export interface User {
   id: string;
   name: string;
@@ -71,12 +88,17 @@ export interface GuardianPredictionRequest {
   };
   timestamp: number;
 }
+export interface GuardianPredictionResponse {
+  equipmentId: string;
+  riskPercentage: number;
+  prediction: string;
+}
 
 export interface FeedbackData {
   simulationId: string;
-  correctPredictions: any[]; // Simplified for frontend
+  correctPredictions: GuardianPredictionResponse[];
   incorrectPredictions: {
-    prediction: any;
+    prediction: GuardianPredictionResponse;
     actualOutcome: string;
   }[];
 }

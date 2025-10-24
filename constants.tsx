@@ -22,7 +22,7 @@ export const DocumentTextIcon: React.FC<{ className?: string }> = ({ className =
 
 export const Cog6ToothIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-.962a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02 1.11-.962.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224.224-.384-.57-.439.91-.046.55-.562 1.02-1.11.962a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02.962-1.11.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224-.224-.384-.57-.439-.91z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-.962a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 015.724 5.724c.046.55-.422 1.02-.962 1.11-.341.055-.65.215-.91.439l-1.06 1.06c-.266.266-.42.61-.42 1.003v.284c0 .414.172.786.42 1.068l.96.96c.267.266.61.42 1.003.42h.283c.414 0 .786-.172 1.068-.42l1.06-1.06c.224-.224.384-.57.439-.91.046-.55.562-1.02.962-1.11a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02 1.11-.962.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224-.224-.384-.57-.439.91-.046.55-.562 1.02-1.11.962a8.97 8.97 0 01-5.724-5.724c-.046-.55.422-1.02.962-1.11.341-.055.65-.215.91-.439l1.06-1.06c.266-.266.42-.61.42-1.003v-.284c0-.414-.172-.786-.42-1.068l-.96-.96a1.492 1.492 0 00-1.003-.42h-.283c-.414 0-.786.172-1.068.42l-1.06 1.06c-.224-.224-.384-.57-.439-.91z" />
   </svg>
 );
 
@@ -31,7 +31,6 @@ export const ChartBarIcon: React.FC<{ className?: string }> = ({ className = "w-
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
     </svg>
 );
-
 
 export const SunIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
@@ -64,6 +63,25 @@ export const PlusCircleIcon: React.FC<{ className?: string }> = ({ className = "
     </svg>
 );
 
+export const InformationCircleIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+    </svg>
+);
+
+export const ArrowTrendingUpIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.28m5.94 2.28L19.5 2.25" />
+    </svg>
+);
+
+export const ArrowTrendingDownIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 5.86 1.83l2.74-1.22m0 0-5.94 2.28m5.94-2.28L19.5 2.25" />
+    </svg>
+);
+
+
 export interface NavItem {
   id: Page;
   label: string;
@@ -71,9 +89,9 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'monitoring', label: 'Monitoramento', icon: ChartBarIcon },
-  { id: 'predictive_intelligence', label: 'Inteligência Preditiva', icon: CpuChipIcon },
-  { id: 'api_returns', label: 'APIs e Retornos', icon: GlobeAltIcon },
-  { id: 'reports', label: 'Relatórios PDF', icon: DocumentTextIcon },
+  { id: 'monitoring', label: 'Visão Geral', icon: ChartBarIcon },
+  { id: 'predictive_intelligence', label: 'Análise Preditiva', icon: CpuChipIcon },
+  { id: 'api_returns', label: 'Explorador de Dados', icon: GlobeAltIcon },
+  { id: 'reports', label: 'Relatórios', icon: DocumentTextIcon },
   { id: 'settings', label: 'Configurações', icon: Cog6ToothIcon },
 ];

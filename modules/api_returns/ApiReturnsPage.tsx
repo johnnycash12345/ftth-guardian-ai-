@@ -8,13 +8,15 @@ import Spinner from '../../components/common/Spinner';
 import { Table, Pagination } from '../../components/common/Table';
 import Toast from '../../components/common/Toast';
 import { Input } from '../../components/common/Input';
+import { handleError } from '../../utils/errorHandler';
+import { ErrorMessage } from '../../components/common/ErrorMessage';
 
 type DataSet = 'hubsoft_clients' | 'hubsoft_service_orders' | 'snmp_devices';
 
 const JsonViewer: React.FC<{ data: object | null }> = ({ data }) => {
     if (!data) return null;
     return (
-        <Card title="Resposta JSON Bruta" className="mt-4">
+        <Card title="Resposta JSON Bruta" subtitle="A resposta completa recebida da API.">
             <pre className="bg-slate-800 text-slate-200 p-4 rounded-md text-sm whitespace-pre-wrap break-all h-64 overflow-y-auto">
                 {JSON.stringify(data, null, 2)}
             </pre>
@@ -29,6 +31,7 @@ const ApiReturnsPage: React.FC = () => {
   const [rawData, setRawData] = useState<object | null>(null);
   const [paginatorInfo, setPaginatorInfo] = useState<PaginatorInfo>({ currentPage: 1, lastPage: 1, total: 0 });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [syncLog, setSyncLog] = useState<SyncLog | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -38,6 +41,7 @@ const ApiReturnsPage: React.FC = () => {
       return;
     }
     setIsLoading(true);
+    setError(null);
     const startTime = Date.now();
     try {
       let response: ApiResponse<any>;
@@ -55,11 +59,12 @@ const ApiReturnsPage: React.FC = () => {
       setPaginatorInfo(response.paginatorInfo);
       setSyncLog({ timestamp: new Date(), responseTime: Date.now() - startTime, status: 'OK', httpStatus: 200 });
 
-    } catch (error: any) {
-      setToast({ message: `Erro ao buscar dados: ${error.message}`, type: 'error' });
-      setSyncLog({ timestamp: new Date(), responseTime: Date.now() - startTime, status: 'Error', httpStatus: 500, error: error.message });
+    } catch (err) {
+      const userMessage = handleError(err);
+      setError(userMessage);
+      setSyncLog({ timestamp: new Date(), responseTime: Date.now() - startTime, status: 'Error', httpStatus: 500, error: userMessage });
       setTableData([]);
-      setRawData({ error: error.message });
+      setRawData({ error: userMessage, details: (err as any).technicalDetails });
     } finally {
       setIsLoading(false);
     }
@@ -113,17 +118,40 @@ const ApiReturnsPage: React.FC = () => {
       </span>
     );
   };
+  
+  const renderContent = () => {
+    if (isLoading) return <Spinner />;
+    if (error) return <ErrorMessage message={error} onRetry={() => fetchData(1)} />;
+    return (
+        <>
+            <h3 className="text-lg font-semibold mb-2">Dados Processados e Tabelados</h3>
+            <Table 
+                columns={getColumns()}
+                data={tableData}
+            />
+            <Pagination 
+                currentPage={paginatorInfo.currentPage}
+                lastPage={paginatorInfo.lastPage}
+                total={paginatorInfo.total}
+                onPageChange={onPageChange}
+            />
+        </>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <div className="flex flex-wrap justify-between items-center gap-4">
-        <h1 className="text-3xl font-bold">APIs e Retornos</h1>
+        <h1 className="text-3xl font-bold">Explorador de Dados</h1>
         <div className="flex items-center space-x-2 flex-wrap gap-2">
            {renderSyncLog()}
             <Button variant="secondary" onClick={() => fetchData(1)} isLoading={isLoading}>Atualizar Agora</Button>
         </div>
       </div>
+       <p className="text-text-light-secondary dark:text-dark-secondary -mt-4">
+        Inspecione os dados brutos e processados retornados pelas APIs integradas.
+      </p>
 
       <Card>
         <div className="flex border-b border-slate-200 dark:border-slate-700 mb-4">
@@ -139,21 +167,7 @@ const ApiReturnsPage: React.FC = () => {
             <Input label="Filtrar por status" id="status-filter" />
         </div>
         
-        {isLoading ? <Spinner /> : (
-          <>
-            <h3 className="text-lg font-semibold mb-2">Dados Processados</h3>
-            <Table 
-              columns={getColumns()}
-              data={tableData}
-            />
-            <Pagination 
-              currentPage={paginatorInfo.currentPage}
-              lastPage={paginatorInfo.lastPage}
-              total={paginatorInfo.total}
-              onPageChange={onPageChange}
-            />
-          </>
-        )}
+        {renderContent()}
       </Card>
 
       {!isLoading && <JsonViewer data={rawData} />}

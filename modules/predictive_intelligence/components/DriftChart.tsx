@@ -2,17 +2,28 @@ import React from 'react';
 import { Card } from '../../../components/common/Card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { DriftDataPoint } from '../../../types';
+import { InfoTooltip } from '../../../components/common/InfoTooltip';
 
 interface DriftChartProps {
     title: string;
     data: DriftDataPoint[];
     dataKey: keyof DriftDataPoint;
     baselineKey: keyof DriftDataPoint;
+    // FIX: Add tooltipText prop to satisfy usage in PredictiveIntelligencePage.
+    tooltipText: string;
 }
 
-export const DriftChart: React.FC<DriftChartProps> = ({ title, data, dataKey, baselineKey }) => {
+export const DriftChart: React.FC<DriftChartProps> = ({ title, data, dataKey, baselineKey, tooltipText }) => {
+    // FIX: Combine title and tooltip into a single ReactNode to pass to the Card component.
+    const cardTitle = (
+        <div className="flex items-center">
+            <span>{title}</span>
+            <InfoTooltip text={tooltipText} />
+        </div>
+    );
+
     return (
-        <Card title={title}>
+        <Card title={cardTitle}>
             <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={data}>
                     <defs>
